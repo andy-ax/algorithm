@@ -1,16 +1,17 @@
 (()=>{
-    const nodeArr = ['A', 'B', 'C', 'D'];
-    const nodeMatrix = [
-        [null, 1, 15, 4],
-        [1, null, 4, 8],
-        [15, 4, null, 5],
-        [4, 8, 5, null]
-    ];
+    // const nodeArr = ['A', 'B', 'C', 'D'];
+    // const nodeMatrix = [
+    //     [null, 1, 15, 4],
+    //     [1, null, 4, 8],
+    //     [15, 4, null, 5],
+    //     [4, 8, 5, null]
+    // ];
     function AntSystem(nodeArr, nodeMatrix) {
         this.nodeArr = nodeArr;
         this.nodeMatrix = nodeMatrix;
     }
-    AntSystem.prototype.init = function() {
+    AntSystem.prototype.init = function(theta) {
+        this.theta = theta;
         this.graph = new Graph();
         this.nodeMatrix.forEach(item => {
             item.forEach((ite, i) => {
@@ -18,7 +19,7 @@
                 // w: 信息素
                 const l = ite;
                 if (l !== null) {
-                    const w = 1;
+                    const w = 10;
                     item[i] = {
                         l, w
                     }
@@ -39,9 +40,9 @@
     AntSystem.prototype.math = function() {
         // 计算最大迭代次数
         const antLen = this.ant.length;
-        const nodeLen = this.nodeArr.length;
+        const nodeLen = this.nodeLen = this.nodeArr.length;
         const n = nodeLen - 1;
-        const lineNum = (n*n + n) / 2; // 路径的数量
+        const lineNum = this.lineNum = (n*n + n) / 2; // 路径的数量
         const maxNum = lineNum*lineNum; // 最大迭代次数
         let i = 0;
 
@@ -61,6 +62,7 @@
                 break;
             }
         }
+        result.twice = i;
         return result;
     };
 
@@ -77,10 +79,19 @@
             throw new Error('获取路径列表错误')
         }
         // 获取可行走路径的权重
+        /**
+         * 蚂蚁访问城市的概率公式：
+         * 所选路径权重*所选路径能见度/所有可选路径*所有可选路径能见度的和
+         * 能见度 = 1/路径距离
+          */
         let weightList = [];
         roadList.forEach(x => {
             const obj = this.graph.getValue(antNowNode, x);
-            weightList.push(obj.w);
+            let value = obj.w*(1/obj.l);
+            if (!value) {
+                value = 0;
+            }
+            weightList.push(value);
         });
         // 获取权重总和，以及根据根据修改后的权重以及随机数来判断走哪条路
         let total = 0;
@@ -101,7 +112,12 @@
     AntSystem.prototype.systemUpdate = function() {
 
         // 信息发挥率
-        const theta = 0.5;
+        const theta = this.theta;
+
+        // 根据挥发率重新计算权重
+        this.graph.each(item => {
+            item.w *= theta*this.nodeLen;
+        });
 
         // 根据每个蚂蚁的行走路径计算总行走距离 l
         const totalWalkList = this.ant.map(x => {
@@ -120,22 +136,17 @@
             const road = x.road;
             // 计算当前蚂蚁产生的信息素
             const thisAntWalkLen = totalWalkList[i];
-            const pheromone = 1/thisAntWalkLen;
+            const pheromone = this.nodeLen/thisAntWalkLen;
             for (let i = 1; i < road.length; i++) {
                 const obj = this.graph.getValue(road[i-1], road[i]);
                 obj.w += pheromone;
             }
         });
 
-        // 根据挥发率重新计算权重
-        this.graph.each(item => {
-            item.w *= theta;
-        });
-
         // 重置当前蚁群的路径
         this.ant.forEach(item => {
             item.road.length = 1;
-        })
+        });
 
     };
     AntSystem.prototype.isConvergence = function() {
@@ -169,7 +180,7 @@
         }
 
         // 当选择的路径信息素占比超过一定值时就算收敛
-        const proportion = 0.7;
+        const proportion = 0.95;
         const result = roadPheromone / pheromoneTotal;
         return {
             result,
@@ -178,10 +189,5 @@
         }
     };
 
-    let antSystem = new AntSystem(nodeArr, nodeMatrix);
-    antSystem.init();
-    const result = antSystem.math();
-
-
-
+    window.AntSystem = AntSystem;
 })();

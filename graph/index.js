@@ -26,7 +26,10 @@
     Graph.prototype.getValue = (start, end) => {
         const startNodeIndex = getNodeIndex(start, this.nodeArr);
         const endNodeIndex = getNodeIndex(end, this.nodeArr);
-        if (startNodeIndex === -1 || endNodeIndex === -1) return;
+        if (startNodeIndex === -1 || endNodeIndex === -1) {
+            debugger
+            return;
+        }
         return this.nodeMatrix[startNodeIndex][endNodeIndex];
     };
     Graph.prototype.addValue = (start, end, value) => {

@@ -5,6 +5,7 @@
     <title>Title</title>
     <script src="graph/index.js"></script>
     <script src="antSystem/index.js"></script>
+    <script src="tsp/tsp.js"></script>
     <style>
         html, body{
             width: 100%;
@@ -16,5 +17,17 @@
 </head>
 <body>
 <canvas id="canvas"></canvas>
+<script>
+    const tsp = new TSP('canvas');
+    const dotArr = tsp.initRandomDot(30);
+    const dotMatrix = tsp.initBoard();
+    const antSystem = new AntSystem(dotArr, dotMatrix);
+    antSystem.init(0.01);
+    const result = antSystem.math();
+    tsp.drawTspResult(result.road);
+    console.log(result);
+    console.log(dotArr);
+    console.log(dotMatrix);
+</script>
 </body>
 </html>
