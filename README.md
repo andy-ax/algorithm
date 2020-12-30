@@ -6,3 +6,9 @@
 
 # antSystem/index.js
 使用ant system来解决tsp问题
+
+# matrix/matrix.js
+矩阵的运算
+
+# leastSquares/index.js
+最小二乘法拟合曲线
