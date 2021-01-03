@@ -2,10 +2,6 @@
  * Created by andy on 2017/8/23.
  */
 (function (windows) {
-    //matrix
-    //[b_1
-    // b_2
-    // b_3]
     /**
      * @return {boolean}
      */
@@ -53,13 +49,14 @@
     (function () {
         Matrix.prototype.lineSim = function () {
             //在列数≤1的情况下直接返回原矩阵
-            var mat = this.copy();
+            const matrix = this.copy();
+            let mat = matrix.mat;
             if (!mat[0].length || mat[0].length <= 1) {
                 return mat;
             } else {
                 //主元
-                var RowLen = mat.length;
-                var RowIndex = 0,
+                const RowLen = mat.length;
+                let RowIndex = 0,
                     i,
                     arr;
                 for (i = 0; i < RowLen; i++) {
@@ -68,11 +65,11 @@
                     mat = arr[1]
                 }
                 reSimStep2(mat);
-                return mat;
+                return new Matrix(mat);
             }
         };
         //主元行化简&行置换
-        var reSimStep1 = function (RowIndex, ColIndex, mat) {
+        const reSimStep1 = function (RowIndex, ColIndex, mat) {
             var RowLen = mat.length;
             var pivot;
             var lineMove = false;
@@ -100,7 +97,7 @@
             return [RowIndex,mat];
         };
         //非主元消去
-        var reSimStep2 = function (mat) {
+        const reSimStep2 = function (mat) {
             var RowLen = mat.length;
             var i,j;
             for (i = 1; i < RowLen; i++) {
@@ -112,14 +109,15 @@
     })();
     //求行列式
     (function () {
-        var n;
+        let n;
         Matrix.prototype.determinant = function () {
             if (this.w !== this.h) return false;
-            var mat = this.copy();
+            const matrix = this.copy();
+            let mat = matrix.mat;
             n = this.w;
             //指示物,作为最终行列式的乘积
-            var indicator = 1;
-            var i;
+            let indicator = 1;
+            let i;
 
             for (i = 0; i < n; i++) {
                 indicator = reSim(mat,i,indicator);
@@ -130,11 +128,11 @@
             }
             return indicator;
         };
-        var reSim = function (mat, index, indicator) {
-            var lineMove = false;
-            var rowLen = n;
-            var pivot;
-            var i,arr;
+        const reSim = function (mat, index, indicator) {
+            let lineMove = false;
+            let rowLen = n;
+            let pivot;
+            let i,arr;
             for (i = index; i < rowLen; i++) {
                 arr = mat[i];
                 if (arr[index] === 0) {
@@ -171,32 +169,7 @@
             if (!arguments[0]) {
                 return false
             }
-            var i,len,mat;
-            if (arguments.length === 1 && arguments[0] instanceof Array === true && arguments[0].length >= 2) {
-                var matArr = arguments[0];
-                len = matArr.length;
-
-                for (i = 0; i < len; i++) {
-                    if (matArr[i] instanceof Matrix === false) {
-                        return false;
-                    }
-                }
-
-                //判定
-                for (i = 1; i < len; i++) {
-                    if (matArr[i-1].w !== matArr[i].h) {
-                        return false;
-                    }
-                }
-
-                //计算
-                mat = matArr[0].mat;
-                for (i = 1; i < len; i++) {
-                    mat = times(mat,matArr[i].mat);
-                }
-
-                return mat;
-            }
+            let i,len,mat;
             if (arguments.length > 1) {
                 len = arguments.length;
 
@@ -219,22 +192,23 @@
                     mat = times(mat,arguments[i].mat);
                 }
 
-                return mat;
+                return new Matrix(mat);
             }
 
             return false;
         };
         function times(mat1, mat2) {
-            var len = mat2[0].length;
-            var arr = [];
-            var i;
+            const len = mat2[0].length;
+            let arr = [];
+            let i;
             for (i = 0; i < len; i++) {
-                arr[i] = vectorTimes(mat1,matrix2verctor(mat2,i));
+                arr[i] = matrixTimesVector(mat1,getMatrix2VectorByIndex(mat2,i));
             }
             return transpose(arr);
         }
-        function vectorTimes(matrix, vector) {
-            var len = vector.length,
+        // 矩阵乘向量
+        function matrixTimesVector(matrix, vector) {
+            let len = vector.length,
                 h = matrix.length,
                 arr = [],
                 i,j;
@@ -247,21 +221,14 @@
             }
             return arr;
         }
-        function matrix2verctor(matrix, index) {
-            var arr = [],
-                len = matrix.length,
-                i;
-
-            for (i = 0; i < len; i++) {
-                arr[i] = matrix[i][index];
-            }
-
-            return arr;
+        // 根据index,从矩阵中的指定index提取向量
+        function getMatrix2VectorByIndex(matrix, index) {
+            return matrix.map(arr=>arr[index]);
         }
     })();
     //矩阵对象的复制
     Matrix.prototype.copy = function () {
-        var mat = this.mat,
+        let mat = this.mat,
             arr = [],
             i,j;
 
@@ -272,25 +239,46 @@
             }
         }
 
-        return arr;
+        return new Matrix(arr);
     };
     //矩阵转置
     Matrix.prototype.transpose = function () {
-        return transpose(this.mat);
+        return new Matrix(transpose(this.mat));
     };
-    //求逆矩阵
+    //求逆矩阵 由于js的特性，故而无法精准计算出是否为可逆矩阵
     Matrix.prototype.inverse = function () {
         if (this.w !== this.h) return false;
-        return Matrix.split(
-            new Matrix(
-                new Matrix(
-                    Matrix.merge(
-                        this,
-                        Matrix.generateIdentityMatrix(this.w)
-                    )
-                ).lineSim()
-            )
+        const result = Matrix.split(
+            Matrix.merge(
+                this,
+                Matrix.generateIdentityMatrix(this.w)
+            ).lineSim()
             ,0,this.w);
+
+        const split = new Matrix(result.split);
+        const other = new Matrix(result.other);
+
+        if (!Matrix.isIdentityMatrix(split)) return false;
+        const timeResult = Matrix.times(this, other).mat;
+
+        let identTotal = 0;
+        let otherTotal = 0;
+        timeResult.forEach((arr, i) => {
+            arr.forEach((item, j) => {
+                if (i === j) {
+                    identTotal += item;
+                } else {
+                    otherTotal += item;
+                }
+            })
+        });
+        identTotal = Math.round(identTotal*1000)/1000;
+        otherTotal = Math.round(otherTotal*1000)/1000;
+        if (identTotal === this.w && otherTotal === 0) {
+            return other;
+        } else {
+            return false;
+        }
     };
 
     //将数组内指定位置的元素移动到另一位置
@@ -348,7 +336,7 @@
     }
     //转置
     function transpose(mat) {
-        var matrix = [],
+        let matrix = [],
             h = mat.length,
             w = mat[0].length,
             i,j;
@@ -362,28 +350,51 @@
         return matrix;
     }
 
+
+    // 判断是否为单位矩阵
+    Matrix.isIdentityMatrix = function(matrix) {
+        if (matrix.w !== matrix.h) return false;
+        const mat = matrix.mat;
+        const result = mat.findIndex((arr, i) => {
+            const result = arr.findIndex((item, j) => {
+                if (i === j) {
+                    if (item !== 1) {
+                        return true;
+                    }
+                } else {
+                    if (item !== 0) {
+                        return true;
+                    }
+                }
+            });
+            return result !== -1;
+        });
+        return result === -1;
+    };
     //矩阵水平合并
     Matrix.merge = function (matrix1, matrix2) {
         if (matrix1.h !== matrix2.h) {
             return false;
         }
-        var len = matrix1.h,
+        let len = matrix1.h,
             mat1 = matrix1.mat,
             mat2 = matrix2.mat;
 
-        var arr = [],
+        let arr = [],
             i;
         for (i = 0; i < len; i++) {
             arr[i] = mat1[i].concat(mat2[i]);
         }
-        return arr;
+        return new Matrix(arr);
     };
     //矩阵垂直合并
-    Matrix.mergeV = function (mat1, mat2) {
-        if (mat1[0].length !== mat2[0].length) {
+    Matrix.mergeV = function (matrix1, matrix2) {
+        let mat1 = matrix1.mat;
+        let mat2 = matrix2.mat;
+        if (mat1.w !== mat2.w) {
             return false;
         }
-        return mat1.concat(mat2);
+        return new Matrix(mat1.concat(mat2));
     };
     Matrix.alert = function (matrix) {
         var str = '';
@@ -402,7 +413,7 @@
     };
     //生成单位矩阵
     Matrix.generateIdentityMatrix = function (n) {
-        var matrix = [],
+        let matrix = [],
             i,j;
         for (i = 0; i < n; i++) {
             matrix[i] = [];
@@ -444,5 +455,55 @@
             split: mat1,
             other: mat2
         }
-    }
+    };
+    //生成数组 例子: '0:1:3' => [0,1,2,3]
+    Matrix.generateArr = function (gen) {
+        const args = gen.split(':');
+        let start,end,space;
+        if (args.length === 2) {
+            [start, end] = args;
+            space = end > start ? 1 : -1;
+        } else if (args.length === 3) {
+            [start, space, end] = args;
+        } else {
+            return;
+        }
+        start = parseFloat(start);
+        end = parseFloat(end);
+        switch (space) {
+            case 'pi':
+                space = Math.PI;
+                break;
+
+            case 'e':
+                space = Math.E;
+                break;
+
+            default:
+                space = parseFloat(space);
+                break;
+        }
+        let arr = [];
+        if (space === 0) {
+            return;
+        } else if (space > 0) {
+            if (start > end) return;
+            let num = start;
+            while (num < end) {
+                arr.push(num);
+                num+=space;
+            }
+            arr.push(end);
+        } else {
+            if (start < end) return;
+            let num = start;
+            while (num > end) {
+                arr.push(num);
+                num+=space;
+            }
+            arr.push(end);
+        }
+        return arr;
+    };
+
 })(typeof window === 'undefined' ? global : window);

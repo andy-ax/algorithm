@@ -15,17 +15,17 @@
     LeastSquares.prototype.math = function () {
         let A = this.mathAMatrix();
         A = new Matrix(A);
-        const AT = new Matrix(A.transpose());
+        const AT = A.transpose();
 
         let yVector = this.zArr || this.yArr;
         yVector = new Matrix(yVector);
 
         let R1Matrix = Matrix.times(AT,A);
         let r2Vector = Matrix.times(AT,yVector);
-        let Result = Matrix.merge(new Matrix(R1Matrix),new Matrix(r2Vector));
-        Result = (new Matrix(Result)).lineSim();
-        const ResultT = (new Matrix(Result)).transpose();
-        return ResultT[ResultT.length - 1];
+        let Result = Matrix.merge(R1Matrix,r2Vector);
+        Result = Result.lineSim();
+        const ResultT = Result.transpose();
+        return ResultT.mat[ResultT.mat.length - 1];
     };
     LeastSquares.prototype.mathAMatrix = function() {
         let A = [];
