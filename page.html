@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="graph/index.js"></script>
+    <script src="tree/tree.js"></script>
+    <script src="antSystem/index.js"></script>
+    <script src="tsp/tsp.js"></script>
+    <script src="matrix/matrix.js"></script>
+    <script src="leastSquares/index.js"></script>
+    <script src="k-means/index.js"></script>
+    <script src="k-means-canvas/index.js"></script>
+    <script src="k-means-canvas/image-k-means.js"></script>
+    <script src="perceptron/perceptron.js"></script>
+    <script src="echarts.js"></script>
+    <script src="postfix-express/postfix-express.js"></script>
+    <script src="auto-diff/forward-mode.js"></script>
+    <script src="auto-diff/autoDiff.js"></script>
+    <style>
+        html, body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #echarts{
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="echarts"></div>
+<canvas id="canvas"></canvas>
+<script>
+    // ant-system tsp test
+    // const tsp = new TSP('canvas');
+    // const dotArr = tsp.initRandomDot(30);
+    // const dotMatrix = tsp.initBoard();
+    // const antSystem = new AntSystem(dotArr, dotMatrix);
+    // antSystem.init(0.01);
+    // const result = antSystem.math();
+    // tsp.drawTspResult(result.road);
+    // console.log(result);
+    // console.log(dotArr);
+    // console.log(dotMatrix);
+</script>
+<script>
+    // 最小二乘法拟合曲线
+    // const leastSquares = new LeastSquares();
+    // leastSquares.setMathFunc([
+    //     ()=>1,
+    //     (x)=>x,
+    //     (x)=>Math.pow(x,2)
+    // ]);
+    // leastSquares.setDots(
+    //     [1, 2, 3, 4, 5],
+    //     [1.5, 5.1, 9.4, 14.8, 21.7]
+    // );
+    // let result = leastSquares.math();
+    // console.log(result)
+</script>
+<script>
+    // const kMeansCanvas = new KMeansCanvas('canvas');
+    // kMeansCanvas.initKMeans();
+    // kMeansCanvas.drawDots();
+</script>
+<script>
+    // const fitDots = [
+    //     [1.7, 3],
+    //     [1.2, 3.9],
+    //     [1.1, 2.7],
+    //     [2.7, 3.5],
+    //     [2.1, 3.8],
+    //     [1.5, 4.2],
+    //     [0.6, 2.6],
+    //     [2.1, 1.4],
+    //     [1.6, 0.7],
+    //     [2.1, 0.55],
+    //     [1.4, 1.15],
+    //     [2.4, 0.78],
+    //     [2.8, 1.6],
+    //     [3.4, 2.1],
+    // ];
+    // const fitResult = [1,1,1,1,1,1,1, -1,-1,-1,-1,-1,-1,-1];
+    // const mathDots = [
+    //     [1.5, 2.7],
+    //     [3.4, 4],
+    //     [1.8, 4.3],
+    //     [0.5, 3],
+    //
+    //     [1.1, 1.1],
+    //     [2.4, 1.8],
+    //     [1.8, 0.2],
+    //     [3.7, 2.1]
+    // ];
+    // const mathResult = [1,1,1,1,-1,-1,-1,-1];
+    // const threshold = 10;
+    // const rate = 0.5;
+    // let per = new Perceptron(fitDots,fitResult);
+    // per.setThreshold(threshold);
+    // per.setRate(rate);
+    // per.fit();
+    // let weight = per.weight;
+    // const result = per.math(mathDots, mathResult);
+    // let ec = echarts.init(document.getElementById('echarts'));
+    //
+    // function f(x) {
+    //     return [x, (threshold-x*weight[0])/weight[1]];
+    // }
+    // const arr = [];
+    // for(let i = 0; i < 5; i+=0.1) {
+    //     arr.push(f(i))
+    // }
+    //
+    // let option = {
+    //     xAxis: {
+    //         max:5
+    //     },
+    //     yAxis: {
+    //         max: 5
+    //     },
+    //     series: [{
+    //         symbolSize: 10,
+    //         data: fitDots,
+    //         type: 'scatter'
+    //     },{
+    //         symbolSize: 10,
+    //         data: mathDots,
+    //         type: 'scatter'
+    //     },{
+    //         showSymbol: false,
+    //         type: 'line',
+    //         data: arr
+    //     }]
+    // };
+    // ec.setOption(option);
+</script>
+<script>
+    // let fm = new ForwardMode();
+    // fm.setVariable(['x1', 'x2']);
+    // fm.setExpression('(ln(x1)+x2)^2-x1');
+    // fm.generateMathStack();
+    // fm.generateGraph();
+    // fm.reverse();
+    // let str = '(x1+x2)^2-ln(x2)';
+    // console.log(str);
+    // let aD = new AutoDiff(str, ['x1','x2']);
+    // aD.generateTree();
+    // aD.diff();
+    // aD.math([1,2]);
+</script>
+</body>
+</html>
