@@ -138,17 +138,12 @@
     // ec.setOption(option);
 </script>
 <script>
-    // let fm = new ForwardMode();
-    // fm.setVariable(['x1', 'x2']);
-    // fm.setExpression('(ln(x1)+x2)^2-x1');
-    // fm.generateMathStack();
-    // fm.generateGraph();
-    // fm.reverse();
-    // let str = '(x1+x2)^2-ln(x2)';
-    // console.log(str);
-    // let aD = new AutoDiff(str, ['x1','x2']);
-    // aD.generateTree();
-    // aD.diff();
+    let str = '(1/(1+(e^(t-(w*b))))-y)^2';
+    console.log(str);
+    let aD = new AutoDiff(str, ['t', 'w', 'b', 'y']);
+    aD.generateTree();
+    aD.diff();
+    debugger
     // aD.math([1,2]);
 </script>
 </body>

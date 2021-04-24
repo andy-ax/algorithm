@@ -177,13 +177,18 @@
         [
             // ^
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(${a.str}^${b.str})`;
+                    const str = `(${a.str}^${b.str})`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(${a.str}^${b.str})`;
+                        node.isVar = true;
+                        const str = `(${aV}^${bV})`;
+                        node.str = str;
+                        return str;
                     } else {
                         return Math.pow(aV,bV);
                     }
@@ -193,13 +198,18 @@
         [
             // *
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(${a.str}*${b.str})`;
+                    const str = `(${a.str}*${b.str})`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(${a.str}*${b.str})`;
+                        node.isVar = true;
+                        const str =  `(${aV}*${bV})`;
+                        node.str = str;
+                        return str;
                     } else {
                         return aV * bV;
                     }
@@ -207,13 +217,18 @@
             },
             // /
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(${a.str}/${b.str})`;
+                    const str = `(${a.str}/${b.str})`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(${a.str}/${b.str})`;
+                        node.isVar = true;
+                        const str = `(${aV}/${bV})`;
+                        node.str = str;
+                        return str;
                     } else {
                         return aV / bV;
                     }
@@ -223,13 +238,18 @@
         [
             // log
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(ln(${a.str})/ln(${b.str}))`;
+                    const str = `(ln(${a.str})/ln(${b.str}))`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(ln(${aV})/ln(${bV}))`;
+                        node.isVar = true;
+                        const str = `(ln(${aV})/ln(${bV}))`;
+                        node.str = str;
+                        return str;
                     } else {
                         return Math.log(bV)/Math.log(aV);
                     }
@@ -239,11 +259,16 @@
             function (a, node) {
                 if (a.isVar) {
                     node.isVar = true;
-                    return `(ln(${a.str}))`;
+                    const str = `(ln(${a.str}))`;
+                    node.str = str;
+                    return str;
                 } else {
                     let aV = a.value();
                     if (a.isVar) {
-                        return `(ln(${aV}))`;
+                        node.isVar = true;
+                        const str = `(ln(${aV}))`;
+                        node.str = str;
+                        return str;
                     } else {
                         return Math.log(aV);
                     }
@@ -253,11 +278,16 @@
             function (a, node) {
                 if (a.isVar) {
                     node.isVar = true;
-                    return `(sin(${a.str}))`;
+                    const str = `(sin(${a.str}))`;
+                    node.str = str;
+                    return str;
                 } else {
                     let aV = a.value();
                     if (a.isVar) {
-                        return `(sin(${aV}))`;
+                        node.isVar = true;
+                        const str = `(sin(${aV}))`;
+                        node.str = str;
+                        return str;
                     } else {
                         return Math.sin(aV);
                     }
@@ -267,11 +297,16 @@
             function (a, node) {
                 if (a.isVar) {
                     node.isVar = true;
-                    return `(cos(${a.str}))`;
+                    const str = `(cos(${a.str}))`;
+                    node.str = str;
+                    return str;
                 } else {
                     let aV = a.value();
                     if (a.isVar) {
-                        return `(cos(${aV}))`;
+                        node.isVar = true;
+                        const str = `(cos(${aV}))`;
+                        node.str = str;
+                        return str;
                     } else {
                         return Math.cos(aV);
                     }
@@ -281,13 +316,18 @@
         [
             // +
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(${a.str}+${b.str})`;
+                    const str = `(${a.str}+${b.str})`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(${aV}+${bV})`;
+                        node.isVar = true;
+                        const str = `(${aV}+${bV})`;
+                        node.str = str;
+                        return str;
                     } else {
                         return aV+bV;
                     }
@@ -295,13 +335,18 @@
             },
             // -
             function (a, b, node) {
-                if (a.isVar || b.isVar) {
+                if (a.isVar && b.isVar) {
                     node.isVar = true;
-                    return `(${a.str}-${b.str})`;
+                    const str = `(${a.str}-${b.str})`;
+                    node.str = str;
+                    return str;
                 } else {
-                    let aV = a.value(), bV = b.value();
+                    let aV = a.str || a.value(), bV = b.str || b.value();
                     if (a.isVar || b.isVar) {
-                        return `(${aV}-${bV})`;
+                        node.isVar = true;
+                        const str = `(${aV}-${bV})`;
+                        node.str = str;
+                        return str;
                     } else {
                         return aV-bV;
                     }
@@ -413,7 +458,13 @@
             // 如果是数字则转化为节点并加入树中
             let node = {
                 value: function () {
-                    return parseFloat(item);
+                    if (item === 'π') {
+                        return 'π';
+                    } else if (item === 'e') {
+                        return 'e';
+                    } else {
+                        return parseFloat(item);
+                    }
                 },
                 str: item,
                 type: 'C',
