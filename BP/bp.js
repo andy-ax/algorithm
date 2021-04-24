@@ -146,11 +146,12 @@
     };
     // 训练
     BPHide1.prototype.fit = function (minMSE) {
-        this.inputs.some((item, index) => {
+        return this.inputs.some((item, index) => {
             const input = item;
             const output = this.outputs[index];
             this.mathOutput(input);
             const mse = this.MSE(this.y, output);
+            // 当均方误差小于设定的值时停止并表示训练完成
             if (mse <= minMSE) {
                 return this;
             } else {
