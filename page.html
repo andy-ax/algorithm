@@ -11,12 +11,15 @@
     <script src="leastSquares/index.js"></script>
     <script src="k-means/index.js"></script>
     <script src="k-means-canvas/index.js"></script>
-    <script src="k-means-canvas/image-k-means.js"></script>
+    <!--<script src="k-means-canvas/image-k-means.js"></script>-->
     <script src="perceptron/perceptron.js"></script>
     <script src="echarts.js"></script>
     <script src="postfix-express/postfix-express.js"></script>
     <script src="auto-diff/forward-mode.js"></script>
     <script src="auto-diff/autoDiff.js"></script>
+    <script src="BP/bp.js"></script>
+    <script src="fitFile/image.js"></script>
+    <script src="fitFile/label.js"></script>
     <style>
         html, body{
             width: 100%;
@@ -145,6 +148,12 @@
     // aD.diff();
     // debugger
     // aD.math([1,2]);
+    const bp = new BPHide1(trainData, trainLabel, 10);
+    bp.init(50, 0.1);
+    bp.fit(0.1);
+    console.log(bp.math(trainData[101],trainLabel[101]));
+    console.log(bp);
+    console.log(trainLabel[101]);
 </script>
 </body>
 </html>

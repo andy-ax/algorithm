@@ -9,11 +9,11 @@
      * 7. 为了防止过拟合，逆传播算法需要使用正则化来更新
      * 8. 选择累积BP误差更新或标准BP误差更新
      */
-    function BPHide1(inputs, outputs) {
+    function BPHide1(inputs, outputs, outputNum) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.inputNum = inputs[0].length;
-        this.outputNum = outputs[0].length;
+        this.outputNum = outputNum;
     }
 
 
@@ -75,36 +75,52 @@
     };
     // 根据输入计算输出 input为一维数组
     BPHide1.prototype.mathOutput = function (input) {
-        let inputMatrix = (new Matrix(input)).transpose();
+        let inputMatrix = new Matrix(input);
         let alpha = Matrix.times(this.V, inputMatrix);
         // 隐层的输出
-        let b = alpha.mat.map((x, i) => this.fn(x - this.gamma[i][0]));
-        b = (new Matrix(b)).transpose();
+        let b = alpha.mat.map((x, i) => {
+            return this.fn(x[0] - this.gamma.mat[i][0])
+        });
+        b = new Matrix(b);
         let beta = Matrix.times(this.W, b);
         // 输出层的输出
-        let y = beta.mat.map((x, i) => this.fn(x - this.theta[i][0]));
+        let y = beta.mat.map((x, i) => {
+            return Math.round(this.fn(x[0] - this.theta.mat[i][0]));
+        });
 
         this.alpha = alpha;
         this.b = b;
         this.beta = beta;
         this.y = y;
     };
+    BPHide1.prototype.updateWeight2 = function(y, input, output) {
+        // f1 = -eta * (W_hj * B_h - Theta_j - y)^2
+        // f2 = -eta * (W_hj * (V_ih * X_i - Gamma_h) - Theta_j - y)^2
+    };
     // 根据误差逆传播算法更新权重
     BPHide1.prototype.updateWeight = function (y, input, output) {
         const self = this;
+        let outputArr = [];
+        for (let i = 0; i < this.outputNum; i++) {
+            if (i === output) {
+                outputArr.push(1000);
+            } else {
+                outputArr.push(0);
+            }
+        }
         function g(j) {
-            return y[j] * (1 - y[j]) * (output[j] - y[j]);
+            return y[j] * (1 - y[j]) * (outputArr[j] - y[j]);
         }
         function e(h) {
-            const bh = self.b[h];
+            const bh = self.b.mat[h];
             let total = 0;
             for (let j = 0; j < self.l; j++) {
-                total += self.W[j][h] * g(j);
+                total += self.W.mat[j][h] * g(j);
             }
             return bh * (1 - bh) * total;
         }
         function deltaW(j, h) {
-            return self.eta * g(j) * self.b[h];
+            return self.eta * g(j) * self.b.mat[h];
         }
         function deltaTheta(j) {
             return -self.eta * g(j)
@@ -122,7 +138,7 @@
             })
         });
         this.theta.mat.forEach((item, j) => {
-            this.theta.mat[j] = item + deltaTheta(j);
+            this.theta.mat[j][0] = item[0] + deltaTheta(j);
         });
         this.V.mat.forEach((arr, h) => {
             arr.forEach((item, i) => {
@@ -130,7 +146,7 @@
             })
         });
         this.gamma.mat.forEach((item, i) => {
-            this.theta.mat[i] = item + deltaTheta(i);
+            this.gamma.mat[i][0] = item[0] + deltaGamma(i);
         });
     };
     /**
@@ -139,8 +155,16 @@
      */
     BPHide1.prototype.MSE = function (y, output) {
         let MSE = 0;
+        let outputArr = [];
+        for (let i = 0; i < this.outputNum; i++) {
+            if (i === output) {
+                outputArr.push(1);
+            } else {
+                outputArr.push(0);
+            }
+        }
         y.forEach((item, j) => {
-            MSE += Math.pow(item - output[j], 2);
+            MSE += Math.pow(item - outputArr[j], 2);
         });
         return MSE;
     };
@@ -152,11 +176,13 @@
             this.mathOutput(input);
             const mse = this.MSE(this.y, output);
             // 当均方误差小于设定的值时停止并表示训练完成
-            if (mse <= minMSE) {
-                return this;
-            } else {
-                this.updateWeight(this.y, output);
-            }
+            // if (mse <= minMSE) {
+            //     debugger
+            //     return this;
+            // } else {
+            //     this.updateWeight(this.y, input, output);
+            // }
+            this.updateWeight(this.y, input, output);
         })
     };
     // 计算
@@ -175,5 +201,7 @@
             maxIndex,
             result: maxIndex === result,
         }
-    }
+    };
+
+    window.BPHide1 = BPHide1;
 })();
