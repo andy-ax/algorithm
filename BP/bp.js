@@ -19,7 +19,7 @@
 
     // 激励函数
     BPHide1.prototype.fn = function(x) {
-        return 1/(1+Math.pow(Math.E, -x));
+        return x/10000;
     };
 
     /**
@@ -85,7 +85,7 @@
         let beta = Matrix.times(this.W, b);
         // 输出层的输出
         let y = beta.mat.map((x, i) => {
-            return Math.round(this.fn(x[0] - this.theta.mat[i][0]));
+            return this.fn(x[0] - this.theta.mat[i][0]);
         });
 
         this.alpha = alpha;
@@ -96,6 +96,73 @@
     BPHide1.prototype.updateWeight2 = function(y, input, output) {
         // f1 = -eta * (W_hj * B_h - Theta_j - y)^2
         // f2 = -eta * (W_hj * (V_ih * X_i - Gamma_h) - Theta_j - y)^2
+        // deltaW_hj = -eta * 2(W_hj * B_h - Theta_j - y) * B_h
+        // deltaTheta_j = eta * 2(W_hj * B_h - Theta_j - y)
+        // deltaV_ih = -eta * 2(W_hj * (V_ih * X_i - Gamma_h) - Theta_j - y) * W_hj * X_i
+        // deltaGamma_h = -eta * 2(W_hj * (V_ih * X_i - Gamma_h) - Theta_j - y) * W_hj
+        let outputArr = [];
+        for (let i = 0; i < this.outputNum; i++) {
+            if (i === output) {
+                outputArr.push(1);
+            } else {
+                outputArr.push(0);
+            }
+        }
+        const eta = this.eta * -2;
+        const W = this.W.mat;
+        const V = this.V.mat;
+        const b = this.b.mat;
+        const theta = this.theta.mat;
+        const gamma = this.gamma.mat;
+        const g = (j, h) => {
+            return eta * ((W[j][h] * b[h] - theta[j])*(1/10000) - outputArr[j]);
+        };
+        const e = (j, h, i) => {
+            return eta * ((W[j][h] * (V[h][i] * input[i] - gamma[h])*(1/10000) - theta[j])*(1/10000) - outputArr[j]) * W[j][h];
+        };
+        const deltaW = (j, h) => {
+            return b[h] * g(j, h);
+        };
+        const deltaTheta = (j) => {
+            let total = 0;
+            for (let h = 0; h < this.q; h++) {
+                total += -1 * g(j, h);
+            }
+            return total;
+        };
+        const deltaV = (h, i) => {
+            let total = 0;
+            for (let j = 0; j < this.l; j++) {
+                total += input[i] * e(j, h, i);
+            }
+            return total;
+        };
+        const deltaGamma = (i) => {
+            let total = 0;
+            for (let j = 0; j < this.l; j++) {
+                for (let h = 0; h < this.q; h++) {
+                    total += -1 * e(j, h, i);
+                }
+            }
+            return total;
+        };
+        this.W.mat.forEach((arr, j) => {
+            arr.forEach((item, h) => {
+                arr[h] = item + deltaW(j, h);
+            })
+        });
+        this.theta.mat.forEach((item, j) => {
+            this.theta.mat[j][0] = item[0] + deltaTheta(j);
+        });
+        this.V.mat.forEach((arr, h) => {
+            arr.forEach((item, i) => {
+                arr[i] = item + deltaV(h, i);
+            })
+        });
+        this.gamma.mat.forEach((item, i) => {
+            this.gamma.mat[i][0] = item[0] + deltaGamma(i);
+        });
+        console.log(this.y);
     };
     // 根据误差逆传播算法更新权重
     BPHide1.prototype.updateWeight = function (y, input, output) {
@@ -176,13 +243,13 @@
             this.mathOutput(input);
             const mse = this.MSE(this.y, output);
             // 当均方误差小于设定的值时停止并表示训练完成
-            // if (mse <= minMSE) {
-            //     debugger
-            //     return this;
-            // } else {
-            //     this.updateWeight(this.y, input, output);
-            // }
-            this.updateWeight(this.y, input, output);
+            if (mse <= minMSE) {
+                debugger
+                return this;
+            } else {
+                this.updateWeight2(this.y, input, output);
+            }
+            // this.updateWeight2(this.y, input, output);
         })
     };
     // 计算
