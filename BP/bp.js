@@ -19,7 +19,8 @@
 
     // 激励函数
     BPHide1.prototype.fn = function(x) {
-        return x/10000;
+        // return x/10000;
+        return (1/(1+Math.pow(Math.E, -x)));
     };
 
     /**
@@ -75,11 +76,18 @@
     };
     // 根据输入计算输出 input为一维数组
     BPHide1.prototype.mathOutput = function (input) {
+        input = input.map(x => x/25226);
         let inputMatrix = new Matrix(input);
         let alpha = Matrix.times(this.V, inputMatrix);
         // 隐层的输出
         let b = alpha.mat.map((x, i) => {
-            return this.fn(x[0] - this.gamma.mat[i][0])
+            let value = this.fn(x[0] - this.gamma.mat[i][0]);
+            if (value === 1) {
+                value = 0.9999999999999999;
+            } else if (value === 0) {
+                value = 1e-323;
+            }
+            return value;
         });
         b = new Matrix(b);
         let beta = Matrix.times(this.W, b);
@@ -170,7 +178,7 @@
         let outputArr = [];
         for (let i = 0; i < this.outputNum; i++) {
             if (i === output) {
-                outputArr.push(1000);
+                outputArr.push(1);
             } else {
                 outputArr.push(0);
             }
@@ -247,7 +255,7 @@
                 debugger
                 return this;
             } else {
-                this.updateWeight2(this.y, input, output);
+                this.updateWeight(this.y, input, output);
             }
             // this.updateWeight2(this.y, input, output);
         })
@@ -263,11 +271,20 @@
                 maxIndex = index;
             }
         });
-        return {
-            max,
-            maxIndex,
-            result: maxIndex === result,
+        if (maxIndex === result) {
+            return 1;
+        } else {
+            return 0;
         }
+    };
+
+    BPHide1.prototype.count = function (inputs, outputs) {
+        const total = outputs.length;
+        let count = 0;
+        inputs.forEach((input, i) => {
+            count += this.math(input, outputs[i]);
+        });
+        return count/total;
     };
 
     window.BPHide1 = BPHide1;
