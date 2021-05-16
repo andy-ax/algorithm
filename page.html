@@ -18,8 +18,9 @@
     <script src="auto-diff/forward-mode.js"></script>
     <script src="auto-diff/autoDiff.js"></script>
     <script src="BP/bp.js"></script>
-    <script src="fitFile/image.js"></script>
-    <script src="fitFile/label.js"></script>
+    <!--<script src="fitFile/image.js"></script>-->
+    <!--<script src="fitFile/label.js"></script>-->
+    <script src="BP/bp2.js"></script>
     <style>
         html, body{
             width: 100%;
@@ -148,6 +149,38 @@
     // aD.diff();
     // debugger
     // aD.math([1,2]);
+    // trainData = [
+    //     [0.1, 0.5, 0.7],
+    //     [-0.73, 0.79, 0.55],//
+    //     [0.14, -0.16, 0.18],
+    //     [-0.75, -0.6, 0.6],//
+    //     [-0.8,-0.75,1],
+    //     [0.45, -0.32, -0.2],//
+    //     [0.01, 0.3, 0.2],
+    //     [0.7, 0.6, 0.6],//
+    //     [-0.8, 0.8, 0.9],
+    //     [0.7,-0.8, 0.6],//
+    //     [0.5, -0.6, 0.6],
+    //     [0.01, 0.01, 0.01],//
+    //     [0.75, 0.75, 1],
+    //     [0.01, 0.8, 0.4],//
+    //     [-0.7, 0.01, 0.4],
+    //     [-0.9, -0.1, 0.5],//
+    //     [-0.35, -0.6, 0.5],
+    //     [-0.2, -0.8, 0.4],//
+    //     [0.55, 0.25, 0.4],
+    //     [-0.3, 0.3, 0.1]//
+    //
+    // ];
+    // trainLabel = [
+    //     1,0,1,0,1,0,1,0,1,0,
+    //     1,0,1,0,1,0,1,0,1,0,
+    // ];
+    // mathData = [
+    //     [0.1, 0.1, 0.9],
+    //     [-0.4, 0.25, -0.3]
+    // ];
+    // mathLabel = [1, 0];
     let total = 0;
     trainData.forEach(input => {
         input.forEach(x => {
@@ -557,10 +590,10 @@
         ]
     ];
     console.log(total / trainData.length);
-    const bp = new BPHide1(trainData, trainLabel, 10);
-    bp.init(10, 0.0001);
-    bp.fit(0.1);
-    console.log(bp.count(trainData.slice(0, 50),trainLabel.slice(0, 50)));
+    const bp = new BP2(trainData, trainLabel, 10, 50);
+    bp.init();
+    bp.fit(0.1, 0.1);
+    // console.log(bp.count(mathData,mathLabel));
     console.log(bp);
 </script>
 </body>

@@ -22,6 +22,9 @@
         // return x/10000;
         return (1/(1+Math.pow(Math.E, -x)));
     };
+    BPHide1.prototype.dfn = function(result) {
+        return result * (1 - result);
+    };
 
     /**
      * x        v   alpha            gamma      b        w                beta             theta      y
@@ -76,7 +79,6 @@
     };
     // 根据输入计算输出 input为一维数组
     BPHide1.prototype.mathOutput = function (input) {
-        input = input.map(x => x/25226);
         let inputMatrix = new Matrix(input);
         let alpha = Matrix.times(this.V, inputMatrix);
         // 隐层的输出
